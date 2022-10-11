@@ -1,15 +1,83 @@
-name: Build Vue
-on: [push]
+name: CI/CD
+
+on: [push, pull_request]
+
 jobs:
-  build_vue:
+  ##### Rust check, test, fmt, clippy
+  check:
+    name: Rust cargo check
     runs-on: ubuntu-latest
-    name: Build Vue
     steps:
-    - uses: actions/checkout@v2
-    - id: Build-Vue
-      uses: AntoineRR/VuePagesAction@add-inputs
-      with:
-        username: 'AntoineRR'
-        reponame: 'weather-landscape'
-        token: ${{ secrets.GITHUB_TOKEN }} # Leave this line unchanged
-        directory: './frontend'
+      - uses: actions/checkout@v3
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          override: true
+      - uses: actions-rs/cargo@v1
+        with:
+          command: check
+  test:
+    name: Rust cargo test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          override: true
+      - uses: actions-rs/cargo@v1
+        with:
+          command: test
+  fmt:
+    name: Rust cargo fmt
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          override: true
+      - uses: actions-rs/cargo@v1
+        with:
+          command: fmt
+          args: --all -- --check
+  clippy:
+    name: Rust cargo clippy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          override: true
+      - uses: actions-rs/cargo@v1
+        with:
+          command: clippy
+          args: -- -D warnings
+  ##### Build Rust + Vue
+  build:
+    name: Build Rust + Vue
+    needs: [check, test, fmt, clippy]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          override: true
+      - name: Install wasm-pack
+        run: cargo install wasm-pack
+      - name: Build Rust
+        run: wasm-pack build
+      - name: Build Vue
+        uses: AntoineRR/VuePagesAction@add-inputs
+        with:
+          username: 'AntoineRR'
+          reponame: 'weather-landscape'
+          token: ${{ secrets.GITHUB_TOKEN }} # Leave this line unchanged
+          directory: './frontend'
