@@ -10,7 +10,7 @@ It requires:
 
 -> Wasm build
 ```
-wasm-pack build
+wasm-pack build --out-dir frontend/pkg/
 ```
 
 -> Vue app
