@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { greet } from '../pkg'
+import { init_wasm, log_weather_data } from '../pkg'
 </script>
 
 <template>
@@ -7,5 +7,6 @@ import { greet } from '../pkg'
 </template>
 
 <script lang="ts">
-greet()
+init_wasm();
+await log_weather_data();
 </script>

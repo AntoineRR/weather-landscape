@@ -9,11 +9,13 @@ It requires:
 ## How to build (development purpose)
 
 -> Wasm build
+You have to setup the WEATHER_API_KEY env variable before running this command. I use the [Visual crossing](https://www.visualcrossing.com/) weather API. You can get a free API key on their website.
 ```
 wasm-pack build --out-dir frontend/pkg/
 ```
 
 -> Vue app
+From the `frontend` directory:
 ```
 npm run dev
 ```
